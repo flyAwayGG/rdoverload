@@ -1,7 +1,4 @@
 
-.idea/misc.xml
-.idea/modules.xml
-.idea/rdoverload.iml
-.idea/workspace.xml
+.idea
 
 *.pyc
