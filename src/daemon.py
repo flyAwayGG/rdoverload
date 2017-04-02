@@ -40,22 +40,19 @@ class Daemon(object):
 
     def __init__(self, pidfile, stdin=os.devnull,
                  stdout=os.devnull, stderr=os.devnull,
-                 home_dir='.', umask=0o22, verbose=1,
+                 home_dir='.', umask=0o22,
                  use_gevent=False, use_eventlet=False):
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
         self.home_dir = home_dir
-        self.verbose = verbose
+
         self.umask = umask
         self.daemon_alive = True
         self.use_gevent = use_gevent
         self.use_eventlet = use_eventlet
 
-    def log(self, *args):
-        if self.verbose >= 1:
-            print(*args)
 
     def daemonize(self):
         """
@@ -94,20 +91,14 @@ class Daemon(object):
 
         if sys.platform != 'darwin':  # This block breaks on OS X
             # Redirect standard file descriptors
+
             sys.stdout.flush()
             sys.stderr.flush()
+
             si = open(self.stdin, 'r')
-            so = open(self.stdout, 'a+')
-            if self.stderr:
-                try:
-                    se = open(self.stderr, 'a+', 0)
-                except ValueError:
-                    # Python 3 can't have unbuffered text I/O
-                    se = open(self.stderr, 'a+', 1)
-            else:
-                se = so
+            se = open(self.stderr, 'a+', 0)
+
             os.dup2(si.fileno(), sys.stdin.fileno())
-            os.dup2(so.fileno(), sys.stdout.fileno())
             os.dup2(se.fileno(), sys.stderr.fileno())
 
         def sigtermhandler(signum, frame):
@@ -123,13 +114,12 @@ class Daemon(object):
             signal.signal(signal.SIGTERM, sigtermhandler)
             signal.signal(signal.SIGINT, sigtermhandler)
 
-        self.log("Started")
-
         # Write pidfile
         atexit.register(
             self.delpid)  # Make sure pid file is removed if we quit
         pid = str(os.getpid())
         open(self.pidfile, 'w+').write("%s\n" % pid)
+
 
     def delpid(self):
         try:
@@ -147,8 +137,6 @@ class Daemon(object):
         """
         Start the daemon
         """
-
-        self.log("Starting...")
 
         # Check for a pidfile to see if the daemon already runs
         try:
@@ -174,8 +162,7 @@ class Daemon(object):
         Stop the daemon
         """
 
-        if self.verbose >= 1:
-            self.log("Stopping...")
+        print("Stopping...")
 
         # Get the pid from the pidfile
         pid = self.get_pid()
@@ -208,8 +195,6 @@ class Daemon(object):
                 print(str(err))
                 sys.exit(1)
 
-        self.log("Stopped")
-
     def restart(self):
         """
         Restart the daemon
@@ -232,13 +217,13 @@ class Daemon(object):
         pid = self.get_pid()
 
         if pid is None:
-            self.log('Process is stopped')
+            # print ('Process is stopped')
             return False
         elif os.path.exists('/proc/%d' % pid):
-            self.log('Process (pid %d) is running...' % pid)
+            # print ('Process (pid %d) is running... \n' % pid)
             return True
         else:
-            self.log('Process (pid %d) is killed' % pid)
+            # print ('Process (pid %d) is killed' % pid)
             return False
 
     def run(self):

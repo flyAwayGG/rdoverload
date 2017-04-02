@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 from sys import argv
 from userlogic import UserLogic
