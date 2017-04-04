@@ -68,8 +68,9 @@ class UserLogic(object):
         self.__help_and_exit("Wrong boundaries for [" + key + "=" + str(value) + "]\n")
 
     def __disable(self):
-        pass
+        daemon = DaemonLogic(pidfile=self.__pid_file)
+        daemon.unload()
 
     def __enable(self, settings):
-        daemon = DaemonLogic(settings=settings, pidfile=self.__pid_file)
-        daemon.start()
+        daemon = DaemonLogic(pidfile=self.__pid_file)
+        daemon.start(settings)

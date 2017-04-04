@@ -6,14 +6,19 @@ from time import sleep
 
 
 class DaemonLogic(Daemon):
-    def __init__(self, settings, pidfile):
+    def __init__(self, pidfile):
         super(DaemonLogic, self).__init__(pidfile)
-        self.__cpu = settings["cpu"]
-        self.__ram = settings["ram"]
-        self.__poll = settings["poll"]
 
-    def run(self):
-        processeslogic = ProcessesLogic(cpu=self.__cpu, ram=self.__ram)
+    def run(self, settings):
+        cpu = settings["cpu"]
+        ram = settings["ram"]
+        poll = settings["poll"]
+
+        processeslogic = ProcessesLogic(cpu=cpu, ram=ram)
         while True:
             processeslogic.print_proc()
-            sleep(self.__poll)
+            sleep(poll)
+
+    def unload(self):
+        if self.is_running():
+            self.stop()

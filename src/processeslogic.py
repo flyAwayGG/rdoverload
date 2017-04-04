@@ -7,5 +7,4 @@ class ProcessesLogic(object):
         self.__ram = ram
 
     def print_proc(self):
-        print
-        print ("WHAZUZUP")
+        print psutil.cpu_percent(interval=None)
