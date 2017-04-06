@@ -1,7 +1,6 @@
 import os
 from sys import exit
 import time
-import sched
 from daemonlogic import DaemonLogic
 ''' 
 Program working as Linux daemon. When any of the processes exceeds 
@@ -33,10 +32,12 @@ class UserLogic(object):
             self.__help_and_exit()
 
         if args_len == 1 and args[0] == "disable":
-            self.__disable()
+            daemon = DaemonLogic(pidfile=self.__pid_file)
+            daemon.unload()
         elif args[0] == "enable":
             settings = self.__parse_enable_args(args[1:])
-            self.__enable(settings)
+            daemon = DaemonLogic(pidfile=self.__pid_file)
+            daemon.start(settings)
         else:
             self.__help_and_exit()
 
@@ -67,10 +68,3 @@ class UserLogic(object):
 
         self.__help_and_exit("Wrong boundaries for [" + key + "=" + str(value) + "]\n")
 
-    def __disable(self):
-        daemon = DaemonLogic(pidfile=self.__pid_file)
-        daemon.unload()
-
-    def __enable(self, settings):
-        daemon = DaemonLogic(pidfile=self.__pid_file)
-        daemon.start(settings)
