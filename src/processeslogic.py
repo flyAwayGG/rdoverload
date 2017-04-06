@@ -3,22 +3,24 @@ import psutil
 
 class ProcessesLogic(object):
     def __init__(self, cpu, ram):
-        self.__cpu = cpu
-        self.__ram = ram
+        self._cpu = cpu
+        self._ram = ram
 
-    def print_proc(self):
-        if psutil.cpu_percent(interval=None) > self.__cpu:
-            # find bad proccess by CPU
-            pass
+    def check(self):
+        if psutil.cpu_percent(interval=None) > self._cpu or \
+                        psutil.virtual_memory().percent > self._ram:
+            pinfo = self._find_bad_proc()
+            self._print_proc(pinfo)
 
-        if psutil.virtual_memory().percent > self.__ram:
+    def _find_bad_proc(self):
+        for proc in psutil.process_iter():
+            try:
+                if proc.cpu_percent() > self._cpu or \
+                                proc.memory_percent() > self._ram:
+                    return proc.as_dict(attrs=['name', 'pid', 'status',
+                                               'cpu_percent', 'memory_percent'])
+            except psutil.NoSuchProcess:
+                pass
 
-            for proc in psutil.process_iter():
-                try:
-                    pinfo = proc.as_dict()  # cpu_percent() #as_dict(attrs=['pid', 'name'])
-                except psutil.NoSuchProcess:
-                    pass
-                else:
-                    print(pinfo)
-            # find bad process by ram
-            pass
+    def _print_proc(self, process):
+        print process

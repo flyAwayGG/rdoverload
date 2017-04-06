@@ -16,7 +16,7 @@ class DaemonLogic(Daemon):
 
         processeslogic = ProcessesLogic(cpu=cpu, ram=ram)
         while True:
-            processeslogic.print_proc()
+            processeslogic.check()
             sleep(poll)
 
     def unload(self):
